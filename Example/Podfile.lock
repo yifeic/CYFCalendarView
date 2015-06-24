@@ -1,0 +1,20 @@
+PODS:
+  - CYFCalendarView (0.1.0)
+  - Expecta (1.0.0)
+  - Specta (1.0.2)
+
+DEPENDENCIES:
+  - CYFCalendarView (from `../`)
+  - Expecta
+  - Specta
+
+EXTERNAL SOURCES:
+  CYFCalendarView:
+    :path: ../
+
+SPEC CHECKSUMS:
+  CYFCalendarView: 33631a6220fd96674ae0b97bd1501c50aacb6fbe
+  Expecta: 32604574add2c46a36f8d2f716b6c5736eb75024
+  Specta: 9cec98310dca411f7c7ffd6943552b501622abfe
+
+COCOAPODS: 0.37.2

@@ -7,6 +7,7 @@
 //
 
 #import "CYFViewController.h"
+#import "CYFCalendarView.h"
 
 @interface CYFViewController ()
 
@@ -18,12 +19,12 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    
+    CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithEvents:nil day:[NSDate date]];
+    calendarView.frame = CGRectMake(0, 64, 320, 400);
+    calendarView.backgroundColor = [UIColor lightGrayColor];
+    [self.view addSubview:calendarView];
+    
 }
 
 @end
