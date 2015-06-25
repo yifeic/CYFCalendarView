@@ -115,7 +115,8 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                                      draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
                                  }
                              }];
-            draggableView.frame = frame;
+            UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
+            draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
             [self addSubview:draggableView];
             [eventViews addObject:draggableView];
         }

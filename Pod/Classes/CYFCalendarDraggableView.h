@@ -15,6 +15,7 @@ typedef void(^CYFCalendarDraggableViewDragBlock)(CYFCalendarDraggableView *dragg
 
 @property (nonatomic, readonly) CGPoint dragBeginPointInSuperview;
 @property (nonatomic, readonly) CGPoint dragBeginCenter;
+@property (nonatomic, readonly) UIEdgeInsets contentViewInsets;
 - (instancetype)initWithContentView:(UIView *)view onDrag:(CYFCalendarDraggableViewDragBlock)onDrag;
 
 @end
