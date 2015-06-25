@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2D5AAD039A93EE779BEEE2A9 /* Pods_CYFCalendarView_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC733696A0FBEEF1A4F9405A /* Pods_CYFCalendarView_Tests.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		57482E101B3C5FEC0093DBF8 /* CYFEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 57482E0F1B3C5FEC0093DBF8 /* CYFEvent.m */; };
 		5908E470E731BC3718790CB3 /* Pods_CYFCalendarView_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EEBD796665AAD1CAD63D0224 /* Pods_CYFCalendarView_Example.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
@@ -38,6 +39,8 @@
 /* Begin PBXFileReference section */
 		13550BF41443A4CAB4E6B708 /* Pods-CYFCalendarView_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CYFCalendarView_Tests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CYFCalendarView_Tests/Pods-CYFCalendarView_Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		1F0162DAF83D0FA324887A1E /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		57482E0E1B3C5FEC0093DBF8 /* CYFEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CYFEvent.h; sourceTree = "<group>"; };
+		57482E0F1B3C5FEC0093DBF8 /* CYFEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CYFEvent.m; sourceTree = "<group>"; };
 		6003F58A195388D20070C39A /* CYFCalendarView_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CYFCalendarView_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6003F58F195388D20070C39A /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -135,6 +138,8 @@
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
 				6003F5A5195388D20070C39A /* CYFViewController.h */,
 				6003F5A6195388D20070C39A /* CYFViewController.m */,
+				57482E0E1B3C5FEC0093DBF8 /* CYFEvent.h */,
+				57482E0F1B3C5FEC0093DBF8 /* CYFEvent.m */,
 				6003F5A8195388D20070C39A /* Images.xcassets */,
 				6003F594195388D20070C39A /* Supporting Files */,
 			);
@@ -391,6 +396,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6003F59E195388D20070C39A /* CYFAppDelegate.m in Sources */,
+				57482E101B3C5FEC0093DBF8 /* CYFEvent.m in Sources */,
 				6003F5A7195388D20070C39A /* CYFViewController.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 			);

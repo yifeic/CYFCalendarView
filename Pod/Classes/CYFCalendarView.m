@@ -7,32 +7,44 @@
 //
 
 #import "CYFCalendarView.h"
+#import "CYFCalendarDraggableView.h"
 
-@interface CYFCalendarView ()
+static const int SECONDS_IN_MINUTE = 60;
+static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
+
+@interface CYFCalendarView () {
+    NSDate *_day;
+}
+
 @property (nonatomic, strong, readonly) NSArray *timelines;
+@property (nonatomic, strong) NSArray *eventViews;
+@property (nonatomic) CGFloat timelineHeight;
+@property (nonatomic) CGFloat timelineLeadingToSuperView;
+@property (nonatomic) CGFloat hourGapHeight;
+@property (nonatomic, strong) NSDate *beginOfDay;
 @end
 
 @implementation CYFCalendarView
 
-- (instancetype)initWithEvents:(NSArray *)events day:(NSDate *)day {
-    self = [super initWithFrame:CGRectZero];
+@dynamic delegate;
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    self = [super initWithFrame:frame];
     if (self) {
         CGFloat timelineHeight = 1;
         CGFloat timelineLeadingToSuperView = 80;
         UIColor *timelineColor = [UIColor blackColor];
-        CGFloat gapHeight = 59;
+        CGFloat hourGapHeight = 59;
         CGFloat timeLabelTrailingSpace = 0;
+        _timelineHeight = timelineHeight;
+        _timelineLeadingToSuperView = timelineLeadingToSuperView;
+        _hourGapHeight = hourGapHeight;
         
-        CGFloat halfGap = (gapHeight + timelineHeight) / 2;
+        CGFloat halfGap = (hourGapHeight + timelineHeight) / 2;
         NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
         timeFormatter.dateFormat = @"h:mma";
         
-        NSCalendar *cal = [NSCalendar currentCalendar];
-        NSDateComponents *components = [cal components:(NSCalendarUnit)( NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond ) fromDate:day];
-        components.second = 0;
-        components.minute = 0;
-        components.hour = 0;
-        NSDate *beginOfDay = [cal dateFromComponents:components];
+        NSDate *beginOfDay = [self _beginOfDay:[NSDate date]];
         
         NSMutableArray *timelines = [NSMutableArray arrayWithCapacity:25*2];
         for (NSInteger i = 0; i < 25*2-1; i++) {
@@ -58,7 +70,7 @@
                 
                 // timeLabel constraints
                 timeLabel.translatesAutoresizingMaskIntoConstraints = NO;
-                timeLabel.text = [timeFormatter stringFromDate:[beginOfDay dateByAddingTimeInterval:i*60*15]].lowercaseString;
+                timeLabel.text = [timeFormatter stringFromDate:[beginOfDay dateByAddingTimeInterval:i*SECONDS_IN_MINUTE*30]].lowercaseString;
                 [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
                 [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeLeading multiplier:1.0 constant:-timeLabelTrailingSpace]];
             }
@@ -69,8 +81,76 @@
         [self addConstraint:[NSLayoutConstraint constraintWithItem:lastTimeline attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0]];
         
         _timelines = timelines;
-        
     }
     return self;
 }
+
+- (void)reloadData {
+    NSAssert(self.events != nil, @"events property cannot be nil");
+    NSAssert(self.day != nil, @"day property cannot be nil");
+    
+    for (UIView *view in self.eventViews) {
+        [view removeFromSuperview];
+    }
+    
+    NSMutableArray *eventViews = [NSMutableArray arrayWithCapacity:self.events.count];
+    for (NSInteger i = 0; i < self.events.count; i++) {
+        id<CYFCalendarEvent> event = self.events[i];
+        
+        CGFloat top = [self _yFromDate:event.startAt];
+        CGFloat bottom = [self _yFromDate:event.endAt];
+        
+        UIView *eventView = [self.delegate calendarView:self viewForEvent:event];
+        
+        CGRect frame = CGRectMake(self.timelineLeadingToSuperView, top, self.bounds.size.width-self.timelineLeadingToSuperView, bottom-top);
+        
+        if (event.editable) {
+            CYFCalendarDraggableView *draggableView =
+            [[CYFCalendarDraggableView alloc]
+                initWithContentView:eventView
+                             onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                                 if (gesture.state == UIGestureRecognizerStateChanged) {
+                                     CGPoint newLocation = [gesture locationInView:self];
+                                     CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                                     draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+                                 }
+                             }];
+            draggableView.frame = frame;
+            [self addSubview:draggableView];
+            [eventViews addObject:draggableView];
+        }
+        else {
+            eventView.frame = frame;
+            [self addSubview:eventView];
+            [eventViews addObject:eventView];
+        }
+        
+    }
+    self.eventViews = eventViews;
+}
+
+- (void)setDay:(NSDate *)day {
+    _day = day;
+    self.beginOfDay = [self _beginOfDay:day];
+}
+
+- (NSDate *)day {
+    return _day;
+}
+
+- (CGFloat)_yFromDate:(NSDate *)date {
+    NSTimeInterval interval = [date timeIntervalSinceDate:self.beginOfDay];
+    NSInteger minutes = interval / SECONDS_IN_MINUTE;
+    return minutes / 60.0 * (self.timelineHeight+self.hourGapHeight);
+}
+
+- (NSDate *)_beginOfDay:(NSDate *)day {
+    NSCalendar *cal = [NSCalendar currentCalendar];
+    NSDateComponents *components = [cal components:(NSCalendarUnit)( NSCalendarUnitYear | NSCalendarUnitMonth | NSCalendarUnitDay | NSCalendarUnitHour | NSCalendarUnitMinute | NSCalendarUnitSecond ) fromDate:day];
+    components.second = 0;
+    components.minute = 0;
+    components.hour = 0;
+    return [cal dateFromComponents:components];
+}
+
 @end
