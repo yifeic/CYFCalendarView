@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 {
     self = [super initWithFrame:CGRectZero];
     if (self) {
-        self.backgroundColor = [UIColor greenColor];
+        self.backgroundColor = [UIColor clearColor];
         _onDrag = onDrag;
         _onResizeTop = onResizeTop;
         _onResizeBottom = onResizeBottom;

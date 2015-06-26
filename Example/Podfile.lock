@@ -1,6 +1,10 @@
 PODS:
-  - CYFCalendarView (0.1.0)
+  - CYFCalendarView (0.1.0):
+    - libextobjc/EXTScope
   - Expecta (1.0.0)
+  - libextobjc/EXTScope (0.4.1):
+    - libextobjc/RuntimeExtensions
+  - libextobjc/RuntimeExtensions (0.4.1)
   - Specta (1.0.2)
 
 DEPENDENCIES:
@@ -13,8 +17,9 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  CYFCalendarView: 33631a6220fd96674ae0b97bd1501c50aacb6fbe
+  CYFCalendarView: 3cb9a3f410b3805e4cc7303c3219f6616d5a23dc
   Expecta: 32604574add2c46a36f8d2f716b6c5736eb75024
+  libextobjc: a650fc1bf489a3d3a9bc2e621efa3e1006fc5471
   Specta: 9cec98310dca411f7c7ffd6943552b501622abfe
 
 COCOAPODS: 0.37.2

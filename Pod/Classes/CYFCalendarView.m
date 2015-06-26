@@ -8,6 +8,7 @@
 
 #import "CYFCalendarView.h"
 #import "CYFCalendarDraggableView.h"
+#import "EXTScope.h"
 
 static const int SECONDS_IN_MINUTE = 60;
 static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
@@ -21,6 +22,7 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
 @property (nonatomic) CGFloat timelineHeight;
 @property (nonatomic) CGFloat timelineLeadingToSuperView;
 @property (nonatomic) CGFloat hourGapHeight;
+@property (nonatomic) CGFloat minVerticalStep;
 @property (nonatomic, strong) NSDate *beginOfDay;
 @end
 
@@ -39,6 +41,7 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
         _timelineHeight = timelineHeight;
         _timelineLeadingToSuperView = timelineLeadingToSuperView;
         _hourGapHeight = hourGapHeight;
+        _minVerticalStep = (self.timelineHeight + self.hourGapHeight) / 4; // 15mins
         
         CGFloat halfGap = (hourGapHeight + timelineHeight) / 2;
         NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
@@ -93,6 +96,8 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
         [view removeFromSuperview];
     }
     
+    @weakify(self)
+    
     NSMutableArray *eventViews = [NSMutableArray arrayWithCapacity:self.events.count];
     for (NSInteger i = 0; i < self.events.count; i++) {
         id<CYFCalendarEvent> event = self.events[i];
@@ -108,27 +113,54 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
             CYFCalendarDraggableView *draggableView =
             [[CYFCalendarDraggableView alloc]
                 initWithContentView:eventView
-                             onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                                 if (gesture.state == UIGestureRecognizerStateChanged) {
-                                     CGPoint newLocation = [gesture locationInView:self];
-                                     CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                                     draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
-                                 }
-                             }
-                        onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                            if (gesture.state == UIGestureRecognizerStateChanged) {
-                                CGPoint newLocation = [gesture locationInView:self];
-                                CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
-                            }
-                        }
-                     onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                         if (gesture.state == UIGestureRecognizerStateChanged) {
-                             CGPoint newLocation = [gesture locationInView:self];
-                             CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                             draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
-                         }
-                     }];
+                onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                    @strongify(self)
+                    CGPoint newLocation = [gesture locationInView:self];
+                    CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                    if (gesture.state == UIGestureRecognizerStateChanged) {
+                        draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+                    }
+                    else {
+                        CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
+                        CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
+                        dy += destTop - top;
+                        draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+                    }
+                }
+                onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                    @strongify(self)
+                    CGPoint newLocation = [gesture locationInView:self];
+                    CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                    
+                    dy = MIN(dy, CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom);
+                    
+                    if (gesture.state == UIGestureRecognizerStateChanged) {
+                        draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+                    }
+                    else {
+                        CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
+                        CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
+                        dy += destTop - top;
+                        draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+                    }
+                }
+                onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                    @strongify(self)
+                    CGPoint newLocation = [gesture locationInView:self];
+                    CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                    
+                    dy = MAX(dy, -(CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom));
+                    
+                    if (gesture.state == UIGestureRecognizerStateChanged) {
+                        draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
+                    }
+                    else {
+                        CGFloat bottom = CGRectGetMaxY(draggableView.dragBeginFrame) + dy - draggableView.contentViewInsets.bottom;
+                        CGFloat destBottom = roundf(bottom / self.minVerticalStep) * self.minVerticalStep;
+                        dy += destBottom - bottom;
+                        draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
+                    }
+                }];
             UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
             draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
             [self addSubview:draggableView];
