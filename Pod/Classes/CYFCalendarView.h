@@ -25,9 +25,13 @@
 @property (nonatomic, strong) NSDate *day;
 @property (nonatomic, weak) id<CYFCalendarViewDelegate> delegate;
 @property (nonatomic, readonly) BOOL hasEventConflict;
+
 @property (nonatomic, strong) UIColor *eventBackgroundColor;
 @property (nonatomic, strong) UIColor *editableEventBackgroundColor;
 @property (nonatomic, strong) UIColor *conflictEventBackgroundColor;
+@property (nonatomic) CGFloat timelineHeight;
+@property (nonatomic) CGFloat timelineLeadingToSuperView;
+@property (nonatomic) CGFloat hourGapHeight;
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)reloadData;

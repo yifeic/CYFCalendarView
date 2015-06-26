@@ -7,6 +7,7 @@
 //
 
 #import "CYFCalendarDraggableView.h"
+#import "CYFCalendarResizeHandleView.h"
 
 typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
     CYFCalendarDraggableViewTouchAreaContent,
@@ -22,9 +23,10 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 @property (nonatomic, readwrite) CGPoint dragBeginPointInSuperview;
 @property (nonatomic, readwrite) CGPoint dragBeginCenter;
 @property (nonatomic, readwrite) CGRect dragBeginFrame;
-@property (nonatomic, readwrite) CGFloat handleSize;
-@property (nonatomic, weak) UIView *topResizeHandle;
-@property (nonatomic, weak) UIView *bottomResizeHandle;
+@property (nonatomic, readonly) CGFloat handleSize;
+@property (nonatomic, readonly) CGFloat handleTouchSize;
+@property (nonatomic, weak) CYFCalendarResizeHandleView *topResizeHandle;
+@property (nonatomic, weak) CYFCalendarResizeHandleView *bottomResizeHandle;
 @property (nonatomic) CYFCalendarDraggableViewTouchArea touchBeginArea;
 @end
 
@@ -39,7 +41,8 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         _onResizeTop = onResizeTop;
         _onResizeBottom = onResizeBottom;
         _handleSize = 10;
-        _contentViewInsets = UIEdgeInsetsMake(self.handleSize/2, 0, self.handleSize/2, 0);
+        _handleTouchSize = 44;
+        _contentViewInsets = UIEdgeInsetsMake(self.handleTouchSize/2, 0, self.handleTouchSize/2, 0);
         
         _panGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(drag:)];
         _panGestureRecognizer.minimumPressDuration = 0;
@@ -62,31 +65,23 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 }
 
 - (void)setupResizeHandle {
-    CGFloat handleSize = self.handleSize;
-    CGFloat handleMargin = 10;
+    CGFloat handleSize = self.handleTouchSize;
+    CGFloat handleMargin = 0;
     
-    UIView *topHandle = [[UIView alloc] initWithFrame:CGRectZero];
+    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:10];
     topHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:topHandle];
-    topHandle.backgroundColor = [UIColor whiteColor];
     NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleSize] options:0 metrics:nil views:viewDict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleSize] options:0 metrics:nil views:viewDict]];
-    topHandle.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
-    topHandle.layer.cornerRadius = handleSize/2;
-    topHandle.layer.borderWidth = 1;
     self.topResizeHandle = topHandle;
     
-    UIView *bottomHandle = [[UIView alloc] initWithFrame:CGRectZero];
+    CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:10];
     bottomHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:bottomHandle];
-    bottomHandle.backgroundColor = [UIColor whiteColor];
     viewDict = NSDictionaryOfVariableBindings(bottomHandle);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[bottomHandle(%f)]-%f-|", handleSize, handleMargin] options:0 metrics:nil views:viewDict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[bottomHandle(%f)]|", handleSize] options:0 metrics:nil views:viewDict]];
-    bottomHandle.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
-    bottomHandle.layer.cornerRadius = handleSize/2;
-    bottomHandle.layer.borderWidth = 1;
     self.bottomResizeHandle = bottomHandle;
 }
 

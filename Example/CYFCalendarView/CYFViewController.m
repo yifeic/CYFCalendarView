@@ -21,7 +21,7 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 64, 320, 400)];
+    CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 20, 320, 568)];
     [self.view addSubview:calendarView];
     
     CYFEvent *e1 = [CYFEvent new];

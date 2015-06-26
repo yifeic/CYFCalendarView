@@ -20,9 +20,6 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
 
 @property (nonatomic, strong, readonly) NSArray *timelines;
 @property (nonatomic, strong) NSArray *eventViews;
-@property (nonatomic) CGFloat timelineHeight;
-@property (nonatomic) CGFloat timelineLeadingToSuperView;
-@property (nonatomic) CGFloat hourGapHeight;
 @property (nonatomic) CGFloat minVerticalStep;
 @property (nonatomic, strong) NSDate *beginOfDay;
 @property (nonatomic, readwrite) BOOL hasEventConflict;
