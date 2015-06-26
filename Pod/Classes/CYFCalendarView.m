@@ -114,7 +114,21 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                                      CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
                                      draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
                                  }
-                             }];
+                             }
+                        onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                            if (gesture.state == UIGestureRecognizerStateChanged) {
+                                CGPoint newLocation = [gesture locationInView:self];
+                                CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+                            }
+                        }
+                     onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+                         if (gesture.state == UIGestureRecognizerStateChanged) {
+                             CGPoint newLocation = [gesture locationInView:self];
+                             CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+                             draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
+                         }
+                     }];
             UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
             draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
             [self addSubview:draggableView];
