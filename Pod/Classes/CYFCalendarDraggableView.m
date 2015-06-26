@@ -68,7 +68,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
     CGFloat handleSize = self.handleTouchSize;
     CGFloat handleMargin = 0;
     
-    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:10];
+    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:16];
     topHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:topHandle];
     NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
@@ -76,7 +76,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleSize] options:0 metrics:nil views:viewDict]];
     self.topResizeHandle = topHandle;
     
-    CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:10];
+    CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:16];
     bottomHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:bottomHandle];
     viewDict = NSDictionaryOfVariableBindings(bottomHandle);
