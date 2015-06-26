@@ -33,6 +33,7 @@
     CYFEvent *e2 = [CYFEvent new];
     e2.startAt = [e1.endAt dateByAddingTimeInterval:60*60];
     e2.endAt = [e2.startAt dateByAddingTimeInterval:60*30];
+    e2.editable = YES;
     
     calendarView.events = @[e1, e2];
     calendarView.day = [NSDate date];
@@ -48,6 +49,10 @@
     v.backgroundColor = [UIColor blueColor];
     
     return v;
+}
+
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
+    NSLog(@"didChangeStartTime %@ of event at index %ld", startTime, index);
 }
 
 @end
