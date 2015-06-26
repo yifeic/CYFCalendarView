@@ -25,6 +25,7 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
 @property (nonatomic) CGFloat hourGapHeight;
 @property (nonatomic) CGFloat minVerticalStep;
 @property (nonatomic, strong) NSDate *beginOfDay;
+@property (nonatomic, readwrite) BOOL hasEventConflict;
 @end
 
 @implementation CYFCalendarView
@@ -36,13 +37,16 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
     if (self) {
         CGFloat timelineHeight = 1;
         CGFloat timelineLeadingToSuperView = 80;
-        UIColor *timelineColor = [UIColor blackColor];
+        UIColor *timelineColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0];
         CGFloat hourGapHeight = 59;
         CGFloat timeLabelTrailingSpace = 0;
         _timelineHeight = timelineHeight;
         _timelineLeadingToSuperView = timelineLeadingToSuperView;
         _hourGapHeight = hourGapHeight;
         _minVerticalStep = (self.timelineHeight + self.hourGapHeight) / 4; // 15mins
+        _eventBackgroundColor = [UIColor whiteColor];
+        _editableEventBackgroundColor =[UIColor colorWithRed:0.37f green:0.75f blue:1.00f alpha:1.00f];
+        _conflictEventBackgroundColor = [UIColor redColor];
         
         CGFloat halfGap = (hourGapHeight + timelineHeight) / 2;
         NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
@@ -116,6 +120,7 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                 initWithContentView:eventView
                 onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
                     @strongify(self)
+                    [self bringSubviewToFront:draggableView];
                     CGPoint newLocation = [gesture locationInView:self];
                     CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
                     if (gesture.state == UIGestureRecognizerStateChanged) {
@@ -126,6 +131,10 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                         CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
                         dy += destTop - top;
                         draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+                        
+                        BOOL hasConflict = [self _hasConflictWithOtherEventViews:draggableView];
+                        self.hasEventConflict = hasConflict;
+                        draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
                         
                         if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:endTime:ofEvent:atIndex:)]) {
                             CGFloat bottom = CGRectGetMaxY(draggableView.frame);
@@ -151,6 +160,10 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                         dy += destTop - top;
                         draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
                         
+                        BOOL hasConflict = [self _hasConflictWithOtherEventViews:draggableView];
+                        self.hasEventConflict = hasConflict;
+                        draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
+                        
                         if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:ofEvent:atIndex:)]) {
                             NSDate *startTime = [self _dateFromY:destTop];
                             [self.delegate calendarView:self didChangeStartTime:startTime ofEvent:event atIndex:i];
@@ -173,6 +186,10 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                         dy += destBottom - bottom;
                         draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
                         
+                        BOOL hasConflict = [self _hasConflictWithOtherEventViews:draggableView];
+                        self.hasEventConflict = hasConflict;
+                        draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
+                        
                         if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEndTime:ofEvent:atIndex:)]) {
                             NSDate *endTime = [self _dateFromY:destBottom];
                             [self.delegate calendarView:self didChangeEndTime:endTime ofEvent:event atIndex:i];
@@ -181,11 +198,13 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
                 }];
             UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
             draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
+            draggableView.contentView.backgroundColor = self.editableEventBackgroundColor;
             [self addSubview:draggableView];
             [eventViews addObject:draggableView];
         }
         else {
             eventView.frame = frame;
+            eventView.backgroundColor = self.eventBackgroundColor;
             [self addSubview:eventView];
             [eventViews addObject:eventView];
         }
@@ -221,6 +240,19 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
     components.minute = 0;
     components.hour = 0;
     return [cal dateFromComponents:components];
+}
+
+- (BOOL)_hasConflictWithOtherEventViews:(CYFCalendarDraggableView *)draggableView {
+    for (UIView *view in self.eventViews) {
+        if (view != draggableView) {
+            CGRect thisFrame = draggableView.contentFrame;
+            CGRect thatFrame = [view isKindOfClass:[CYFCalendarDraggableView class]] ? [(CYFCalendarDraggableView *)view contentFrame] : view.frame;
+            if (CGRectIntersectsRect(thisFrame, thatFrame)) {
+                return YES;
+            }
+        }
+    }
+    return NO;
 }
 
 @end

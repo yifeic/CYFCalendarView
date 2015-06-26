@@ -22,7 +22,6 @@
 	// Do any additional setup after loading the view, typically from a nib.
     
     CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 64, 320, 400)];
-    calendarView.backgroundColor = [UIColor lightGrayColor];
     [self.view addSubview:calendarView];
     
     CYFEvent *e1 = [CYFEvent new];
@@ -33,7 +32,7 @@
     CYFEvent *e2 = [CYFEvent new];
     e2.startAt = [e1.endAt dateByAddingTimeInterval:60*60];
     e2.endAt = [e2.startAt dateByAddingTimeInterval:60*30];
-    e2.editable = YES;
+//    e2.editable = YES;
     
     calendarView.events = @[e1, e2];
     calendarView.day = [NSDate date];
@@ -46,7 +45,14 @@
 
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event {
     UIView *v = [[UIView alloc] init];
-    v.backgroundColor = [UIColor blueColor];
+    
+    if (event.editable) {
+    }
+    else {
+        v.layer.borderColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0].CGColor;
+        v.layer.borderWidth = 1;
+    }
+    v.layer.cornerRadius = 3;
     
     return v;
 }

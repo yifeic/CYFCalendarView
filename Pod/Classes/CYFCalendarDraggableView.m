@@ -43,6 +43,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         _panGestureRecognizer.minimumPressDuration = 0;
         [self addGestureRecognizer:self.panGestureRecognizer];
         
+        _contentView = view;
         [self setupContentView:view];
         [self setupResizeHandle];
     }
@@ -107,6 +108,10 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
                 break;
         }
     }
+}
+
+- (CGRect)contentFrame {
+    return UIEdgeInsetsInsetRect(self.frame, self.contentViewInsets);
 }
 
 @end
