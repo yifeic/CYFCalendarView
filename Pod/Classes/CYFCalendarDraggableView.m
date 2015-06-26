@@ -22,6 +22,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 @property (nonatomic, readwrite) CGPoint dragBeginPointInSuperview;
 @property (nonatomic, readwrite) CGPoint dragBeginCenter;
 @property (nonatomic, readwrite) CGRect dragBeginFrame;
+@property (nonatomic, readwrite) CGFloat handleSize;
 @property (nonatomic, weak) UIView *topResizeHandle;
 @property (nonatomic, weak) UIView *bottomResizeHandle;
 @property (nonatomic) CYFCalendarDraggableViewTouchArea touchBeginArea;
@@ -37,7 +38,8 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         _onDrag = onDrag;
         _onResizeTop = onResizeTop;
         _onResizeBottom = onResizeBottom;
-        _contentViewInsets = UIEdgeInsetsMake(10, 0, 10, 0);
+        _handleSize = 10;
+        _contentViewInsets = UIEdgeInsetsMake(self.handleSize/2, 0, self.handleSize/2, 0);
         
         _panGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(drag:)];
         _panGestureRecognizer.minimumPressDuration = 0;
@@ -60,22 +62,31 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 }
 
 - (void)setupResizeHandle {
+    CGFloat handleSize = self.handleSize;
+    CGFloat handleMargin = 10;
+    
     UIView *topHandle = [[UIView alloc] initWithFrame:CGRectZero];
     topHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:topHandle];
-    topHandle.backgroundColor = [UIColor yellowColor];
+    topHandle.backgroundColor = [UIColor whiteColor];
     NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"|-10-[topHandle(20)]" options:0 metrics:nil views:viewDict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[topHandle(20)]" options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleSize] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleSize] options:0 metrics:nil views:viewDict]];
+    topHandle.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
+    topHandle.layer.cornerRadius = handleSize/2;
+    topHandle.layer.borderWidth = 1;
     self.topResizeHandle = topHandle;
     
     UIView *bottomHandle = [[UIView alloc] initWithFrame:CGRectZero];
     bottomHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:bottomHandle];
-    bottomHandle.backgroundColor = [UIColor yellowColor];
+    bottomHandle.backgroundColor = [UIColor whiteColor];
     viewDict = NSDictionaryOfVariableBindings(bottomHandle);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"[bottomHandle(20)]-10-|" options:0 metrics:nil views:viewDict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[bottomHandle(20)]|" options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[bottomHandle(%f)]-%f-|", handleSize, handleMargin] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[bottomHandle(%f)]|", handleSize] options:0 metrics:nil views:viewDict]];
+    bottomHandle.layer.borderColor = [UIColor colorWithWhite:0.8 alpha:1.0].CGColor;
+    bottomHandle.layer.cornerRadius = handleSize/2;
+    bottomHandle.layer.borderWidth = 1;
     self.bottomResizeHandle = bottomHandle;
 }
 
