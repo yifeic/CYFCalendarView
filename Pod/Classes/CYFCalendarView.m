@@ -12,7 +12,6 @@
 
 static const int SECONDS_IN_MINUTE = 60;
 static const int MINUTES_IN_HOUR = 60;
-static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
 
 @interface CYFCalendarView () {
     NSDate *_day;
@@ -100,7 +99,7 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
     _timelines = timelines;
 }
 
-- (void)reloadData {
+- (void)reloadEvents {
     NSAssert(self.events != nil, @"events property cannot be nil");
     NSAssert(self.day != nil, @"day property cannot be nil");
     

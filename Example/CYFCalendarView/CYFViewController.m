@@ -43,7 +43,7 @@
     calendarView.delegate = self;
     
     [calendarView reloadTimelines];
-    [calendarView reloadData];
+    [calendarView reloadEvents];
     
 }
 

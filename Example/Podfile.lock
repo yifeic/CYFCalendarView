@@ -17,7 +17,7 @@ EXTERNAL SOURCES:
     :path: ../
 
 SPEC CHECKSUMS:
-  CYFCalendarView: cb0cb01fbcc6933b946357f72f3b8b6a166647dd
+  CYFCalendarView: debd8d6ebf9bc05a676944bdc28e33ce19aa1ccf
   Expecta: 32604574add2c46a36f8d2f716b6c5736eb75024
   libextobjc: a650fc1bf489a3d3a9bc2e621efa3e1006fc5471
   Specta: 9cec98310dca411f7c7ffd6943552b501622abfe

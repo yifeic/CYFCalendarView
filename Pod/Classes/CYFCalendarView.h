@@ -35,15 +35,18 @@
 @property (nonatomic, strong) UIFont *timeLabelFont;
 @property (nonatomic, strong) UIColor *timeLabelColor;
 
-/// Event views properties. Set up these before calling reloadData.
+/// Array of CYFCalendarEvent.
 @property (nonatomic, strong) NSArray *events;
 @property (nonatomic, strong) NSDate *day;
+
+/// Event views properties. Set up these before calling reloadData.
 @property (nonatomic, strong) UIColor *eventBackgroundColor;
 @property (nonatomic, strong) UIColor *editableEventBackgroundColor;
 @property (nonatomic, strong) UIColor *conflictEventBackgroundColor;
 
 - (instancetype)initWithFrame:(CGRect)frame;
-- (void)reloadData;
+
+- (void)reloadEvents;
 - (void)reloadTimelines;
 
 @end

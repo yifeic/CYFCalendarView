@@ -10,7 +10,6 @@
 
 @protocol CYFCalendarEvent <NSObject>
 
-- (NSString *)title;
 - (NSDate *)startAt;
 - (NSDate *)endAt;
 - (BOOL)editable;
