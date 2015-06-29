@@ -32,62 +32,72 @@ static const int SECONDS_IN_HOUR = SECONDS_IN_MINUTE*60;
 - (instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat timelineHeight = 1;
-        CGFloat timelineLeadingToSuperView = 80;
-        UIColor *timelineColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0];
-        CGFloat hourGapHeight = 59;
-        CGFloat timeLabelTrailingSpace = 0;
-        _timelineHeight = timelineHeight;
-        _timelineLeadingToSuperView = timelineLeadingToSuperView;
-        _hourGapHeight = hourGapHeight;
-        _minVerticalStep = (self.timelineHeight + self.hourGapHeight) / 4; // 15mins
+        _timelineHeight = 1;
+        _timelineLeadingToSuperView = 80;
+        _hourGapHeight = 59;
+        _timelineColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0];
         _eventBackgroundColor = [UIColor whiteColor];
         _editableEventBackgroundColor =[UIColor colorWithRed:0.37f green:0.75f blue:1.00f alpha:1.00f];
         _conflictEventBackgroundColor = [UIColor redColor];
-        
-        CGFloat halfGap = (hourGapHeight + timelineHeight) / 2;
-        NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
-        timeFormatter.dateFormat = @"h:mma";
-        
-        NSDate *beginOfDay = [self _beginOfDay:[NSDate date]];
-        
-        NSMutableArray *timelines = [NSMutableArray arrayWithCapacity:25*2];
-        for (NSInteger i = 0; i < 25*2-1; i++) {
-            CGFloat lineTop = i * halfGap;
-
-            // configure timeline
-            UIView *timeline = [[UIView alloc] initWithFrame:CGRectZero];
-            [self addSubview:timeline];
-            timeline.backgroundColor = timelineColor;
-            
-            // timeline constraints
-            timeline.translatesAutoresizingMaskIntoConstraints = NO;
-            NSDictionary *timelineDict = NSDictionaryOfVariableBindings(timeline);
-            [self addConstraint:[NSLayoutConstraint constraintWithItem:timeline attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0 constant:-timelineLeadingToSuperView]];
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[timeline]|", timelineLeadingToSuperView] options:0 metrics:nil views:timelineDict]];
-            [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[timeline(%f)]", lineTop, timelineHeight] options:0 metrics:nil views:timelineDict]];
-            [timelines addObject:timeline];
-            
-            if (i % 2 == 0) {
-                // configure timeLabel
-                UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
-                [self addSubview:timeLabel];
-                
-                // timeLabel constraints
-                timeLabel.translatesAutoresizingMaskIntoConstraints = NO;
-                timeLabel.text = [timeFormatter stringFromDate:[beginOfDay dateByAddingTimeInterval:i*SECONDS_IN_MINUTE*30]].lowercaseString;
-                [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
-                [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeLeading multiplier:1.0 constant:-timeLabelTrailingSpace]];
-            }
-        }
-        
-        // bottom constraint
-        UIView *lastTimeline = timelines.lastObject;
-        [self addConstraint:[NSLayoutConstraint constraintWithItem:lastTimeline attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0]];
-        
-        _timelines = timelines;
+        _timeLabelTrailingSpace = 0;
     }
     return self;
+}
+
+- (void)reloadTimelines {
+    CGFloat timelineHeight = self.timelineHeight;
+    CGFloat timelineLeadingToSuperView = self.timelineLeadingToSuperView;
+    UIColor *timelineColor = self.timelineColor;
+    CGFloat hourGapHeight = self.hourGapHeight;
+    self.minVerticalStep = (self.timelineHeight + self.hourGapHeight) / 4; // 15mins
+    CGFloat timeLabelTrailingSpace = self.timeLabelTrailingSpace;
+    CGFloat halfGap = (hourGapHeight + timelineHeight) / 2;
+    
+    for (UIView *v in self.timelines) {
+        [v removeFromSuperview];
+    }
+    
+    NSDateFormatter *timeFormatter = [[NSDateFormatter alloc] init];
+    timeFormatter.dateFormat = @"h:mma";
+    NSDate *beginOfDay = [self _beginOfDay:[NSDate date]];
+    
+    NSMutableArray *timelines = [NSMutableArray arrayWithCapacity:25*2];
+    for (NSInteger i = 0; i < 25*2-1; i++) {
+        CGFloat lineTop = i * halfGap;
+        
+        // configure timeline
+        UIView *timeline = [[UIView alloc] initWithFrame:CGRectZero];
+        [self addSubview:timeline];
+        timeline.backgroundColor = timelineColor;
+        
+        // timeline constraints
+        timeline.translatesAutoresizingMaskIntoConstraints = NO;
+        NSDictionary *timelineDict = NSDictionaryOfVariableBindings(timeline);
+        [self addConstraint:[NSLayoutConstraint constraintWithItem:timeline attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeWidth multiplier:1.0 constant:-timelineLeadingToSuperView]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[timeline]|", timelineLeadingToSuperView] options:0 metrics:nil views:timelineDict]];
+        [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%f-[timeline(%f)]", lineTop, timelineHeight] options:0 metrics:nil views:timelineDict]];
+        [timelines addObject:timeline];
+        
+        if (i % 2 == 0) {
+            // configure timeLabel
+            UILabel *timeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 30)];
+            timeLabel.font = self.timeLabelFont;
+            timeLabel.textColor = self.timeLabelColor;
+            [self addSubview:timeLabel];
+            
+            // timeLabel constraints
+            timeLabel.translatesAutoresizingMaskIntoConstraints = NO;
+            timeLabel.text = [timeFormatter stringFromDate:[beginOfDay dateByAddingTimeInterval:i*SECONDS_IN_MINUTE*30]].lowercaseString;
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeCenterY relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeCenterY multiplier:1.0 constant:0]];
+            [self addConstraint:[NSLayoutConstraint constraintWithItem:timeLabel attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:timeline attribute:NSLayoutAttributeLeading multiplier:1.0 constant:-timeLabelTrailingSpace]];
+        }
+    }
+    
+    // bottom constraint
+    UIView *lastTimeline = timelines.lastObject;
+    [self addConstraint:[NSLayoutConstraint constraintWithItem:lastTimeline attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0 constant:0]];
+    
+    _timelines = timelines;
 }
 
 - (void)reloadData {

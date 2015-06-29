@@ -24,6 +24,9 @@
     CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 20, 320, 568)];
     [self.view addSubview:calendarView];
     
+
+    calendarView.timeLabelTrailingSpace = 10;
+    
     CYFEvent *e1 = [CYFEvent new];
     e1.startAt = [NSDate date];
     e1.endAt = [e1.startAt dateByAddingTimeInterval:60*60];
@@ -39,6 +42,7 @@
     
     calendarView.delegate = self;
     
+    [calendarView reloadTimelines];
     [calendarView reloadData];
     
 }

@@ -21,19 +21,29 @@
 
 @interface CYFCalendarView : UIScrollView
 
-@property (nonatomic, strong) NSArray *events;
-@property (nonatomic, strong) NSDate *day;
 @property (nonatomic, weak) id<CYFCalendarViewDelegate> delegate;
+
+/// Yes if any event overlaps with another.
 @property (nonatomic, readonly) BOOL hasEventConflict;
 
+/// Timeline and timeLabel propertyies. Set up these before calling reloadTimelines.
+@property (nonatomic, strong) UIColor *timelineColor;
+@property (nonatomic) CGFloat timelineHeight;
+@property (nonatomic) CGFloat hourGapHeight;
+@property (nonatomic) CGFloat timeLabelTrailingSpace;
+@property (nonatomic) CGFloat timelineLeadingToSuperView;
+@property (nonatomic, strong) UIFont *timeLabelFont;
+@property (nonatomic, strong) UIColor *timeLabelColor;
+
+/// Event views properties. Set up these before calling reloadData.
+@property (nonatomic, strong) NSArray *events;
+@property (nonatomic, strong) NSDate *day;
 @property (nonatomic, strong) UIColor *eventBackgroundColor;
 @property (nonatomic, strong) UIColor *editableEventBackgroundColor;
 @property (nonatomic, strong) UIColor *conflictEventBackgroundColor;
-@property (nonatomic) CGFloat timelineHeight;
-@property (nonatomic) CGFloat timelineLeadingToSuperView;
-@property (nonatomic) CGFloat hourGapHeight;
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)reloadData;
+- (void)reloadTimelines;
 
 @end
