@@ -14,10 +14,10 @@ Pod::Spec.new do |s|
   s.description      = <<-DESC
                        CYFCalendarView displays events of a day like the iOS calendar app. You can drag and drop an event to change it's' start and end time.
                        DESC
-  s.homepage         = "https://github.com/<GITHUB_USERNAME>/CYFCalendarView"
+  s.homepage         = "https://github.com/yifeic/CYFCalendarView"
   s.license          = 'MIT'
   s.author           = { "yifeic" => "yifei.chen@outlook.com" }
-  s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/CYFCalendarView.git", :tag => s.version.to_s }
+  s.source           = { :git => "https://github.com/yifeic/CYFCalendarView.git", :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/victoryifei'
 
   s.platform     = :ios, '8.0'
