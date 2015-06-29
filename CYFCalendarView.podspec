@@ -10,21 +10,17 @@
 Pod::Spec.new do |s|
   s.name             = "CYFCalendarView"
   s.version          = "0.1.0"
-  s.summary          = "A short description of CYFCalendarView."
+  s.summary          = "CYFCalendarView displays events of a day like the iOS calendar app."
   s.description      = <<-DESC
-                       An optional longer description of CYFCalendarView
-
-                       * Markdown format.
-                       * Don't worry about the indent, we strip it!
+                       CYFCalendarView displays events of a day like the iOS calendar app. You can drag and drop an event to change it's' start and end time.
                        DESC
   s.homepage         = "https://github.com/<GITHUB_USERNAME>/CYFCalendarView"
-  # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
   s.author           = { "yifeic" => "yifei.chen@outlook.com" }
   s.source           = { :git => "https://github.com/<GITHUB_USERNAME>/CYFCalendarView.git", :tag => s.version.to_s }
-  # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
+  # s.social_media_url = 'https://twitter.com/victoryifei'
 
-  s.platform     = :ios, '7.0'
+  s.platform     = :ios, '8.0'
   s.requires_arc = true
 
   s.source_files = 'Pod/Classes/**/*'
@@ -32,7 +28,7 @@ Pod::Spec.new do |s|
     'CYFCalendarView' => ['Pod/Assets/*.png']
   }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
+  s.public_header_files = 'Pod/Classes/**/*.h'
+  s.frameworks = 'UIKit'
   s.dependency 'libextobjc/EXTScope'
 end
