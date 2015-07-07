@@ -50,7 +50,7 @@
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event {
     UIView *v = [[UIView alloc] init];
     
-    if (event.editable) {
+    if ([(CYFEvent *)event editable]) {
     }
     else {
         v.layer.borderColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0].CGColor;
@@ -63,6 +63,10 @@
 
 - (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
     NSLog(@"didChangeStartTime %@ of event at index %ld", startTime, index);
+}
+
+- (BOOL)calendarView:(CYFCalendarView *)calendarView canEditEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
+    return [(CYFEvent *)event editable];
 }
 
 @end

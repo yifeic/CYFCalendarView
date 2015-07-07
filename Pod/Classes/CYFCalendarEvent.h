@@ -12,6 +12,5 @@
 
 - (NSDate *)startAt;
 - (NSDate *)endAt;
-- (BOOL)editable;
 
 @end

@@ -120,7 +120,12 @@ static const int MINUTES_IN_HOUR = 60;
         
         CGRect frame = CGRectMake(self.timelineLeadingToSuperView, top, self.bounds.size.width-self.timelineLeadingToSuperView, bottom-top);
         
-        if (event.editable) {
+        BOOL editable = NO;
+        if ([self.delegate respondsToSelector:@selector(calendarView:canEditEvent:atIndex:)]) {
+            editable = [self.delegate calendarView:self canEditEvent:event atIndex:i];
+        }
+        
+        if (editable) {
             CYFCalendarDraggableView *draggableView =
             [[CYFCalendarDraggableView alloc]
                 initWithContentView:eventView
