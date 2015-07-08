@@ -36,6 +36,7 @@
 @property (nonatomic) CGFloat eventViewLeading;
 @property (nonatomic, strong) UIFont *timeLabelFont;
 @property (nonatomic, strong) UIColor *timeLabelColor;
+@property (nonatomic, strong) UIColor *currentTimelineColor;
 
 /// Array of CYFCalendarEvent.
 @property (nonatomic, strong) NSArray *events;

@@ -22,6 +22,8 @@ static const int MINUTES_IN_HOUR = 60;
 @property (nonatomic) CGFloat minVerticalStep;
 @property (nonatomic, strong) NSDate *beginOfDay;
 @property (nonatomic, readwrite) BOOL hasEventConflict;
+@property (nonatomic, readonly) UIView *currentTimeline;
+@property (nonatomic, strong) NSTimer *timer;
 @end
 
 @implementation CYFCalendarView
@@ -41,6 +43,13 @@ static const int MINUTES_IN_HOUR = 60;
         _timeLabelTrailingSpace = 0;
         _eventViewLeading = 0;
         _eventViewTrailing = 0;
+        _currentTimelineColor = [UIColor redColor];
+        
+        // current timeline
+        _currentTimeline = [[UIView alloc] initWithFrame:CGRectZero];
+        [self addSubview:_currentTimeline];
+        self.currentTimeline.backgroundColor = self.currentTimelineColor;
+        self.currentTimeline.hidden = YES;
     }
     return self;
 }
@@ -101,12 +110,38 @@ static const int MINUTES_IN_HOUR = 60;
     _timelines = timelines;
 }
 
+- (void)startUpdatingCurrentTimeline {
+    self.currentTimeline.hidden = NO;
+    [self.timer invalidate];
+    NSTimer *timer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(onTimer:) userInfo:nil repeats:YES];
+    self.timer = timer;
+    [self onTimer:timer];
+}
+
+- (void)stopUpdatingCurrentTimeline {
+    self.currentTimeline.hidden = YES;
+    [self.timer invalidate];
+    self.timer = nil;
+}
+
+- (void)onTimer:(NSTimer *)timer {
+    CGFloat y = [self _yFromDate:[NSDate date]];
+    self.currentTimeline.frame = CGRectMake(self.timelineLeadingToSuperView, y, self.frame.size.width-self.timelineLeadingToSuperView, self.timelineHeight);
+}
+
 - (void)reloadEvents {
     NSAssert(self.events != nil, @"events property cannot be nil");
     NSAssert(self.day != nil, @"day property cannot be nil");
     
     for (UIView *view in self.eventViews) {
         [view removeFromSuperview];
+    }
+    
+    if ([[NSCalendar currentCalendar] isDateInToday:self.day]) {
+        [self startUpdatingCurrentTimeline];
+    }
+    else {
+        [self stopUpdatingCurrentTimeline];
     }
     
     @weakify(self)
@@ -225,6 +260,7 @@ static const int MINUTES_IN_HOUR = 60;
         
     }
     self.eventViews = eventViews;
+    [self bringSubviewToFront:self.currentTimeline];
 }
 
 - (void)setDay:(NSDate *)day {
@@ -257,14 +293,18 @@ static const int MINUTES_IN_HOUR = 60;
 }
 
 - (BOOL)_hasConflictWithOtherEventViews:(CYFCalendarDraggableView *)draggableView {
+    CGRect thisFrame = draggableView.contentFrame;
     for (UIView *view in self.eventViews) {
         if (view != draggableView) {
-            CGRect thisFrame = draggableView.contentFrame;
             CGRect thatFrame = [view isKindOfClass:[CYFCalendarDraggableView class]] ? [(CYFCalendarDraggableView *)view contentFrame] : view.frame;
             if (CGRectIntersectsRect(thisFrame, thatFrame)) {
                 return YES;
             }
         }
+    }
+    
+    if (!self.currentTimeline.hidden && CGRectGetMinY(thisFrame) < CGRectGetMinY(self.currentTimeline.frame)) {
+        return YES;
     }
     return NO;
 }
