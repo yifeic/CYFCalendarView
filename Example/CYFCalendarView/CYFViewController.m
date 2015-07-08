@@ -48,7 +48,7 @@
     
 }
 
-- (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event {
+- (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
     UIView *v = [[UIView alloc] init];
     
     if ([(CYFEvent *)event editable]) {

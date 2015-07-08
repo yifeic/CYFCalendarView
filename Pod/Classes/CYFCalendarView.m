@@ -118,7 +118,7 @@ static const int MINUTES_IN_HOUR = 60;
         CGFloat top = [self _yFromDate:event.startAt];
         CGFloat bottom = [self _yFromDate:event.endAt];
         
-        UIView *eventView = [self.delegate calendarView:self viewForEvent:event];
+        UIView *eventView = [self.delegate calendarView:self viewForEvent:event atIndex:i];
         
         CGRect frame = CGRectMake(self.timelineLeadingToSuperView+self.eventViewLeading, top, 1, bottom-top);
         
