@@ -33,6 +33,8 @@
 @property (nonatomic) CGFloat hourGapHeight;
 @property (nonatomic) CGFloat timeLabelTrailingSpace;
 @property (nonatomic) CGFloat timelineLeadingToSuperView;
+@property (nonatomic) CGFloat eventViewTrailing;
+@property (nonatomic) CGFloat eventViewLeading;
 @property (nonatomic, strong) UIFont *timeLabelFont;
 @property (nonatomic, strong) UIColor *timeLabelColor;
 

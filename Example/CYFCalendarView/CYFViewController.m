@@ -26,6 +26,7 @@
     
 
     calendarView.timeLabelTrailingSpace = 10;
+    calendarView.eventViewTrailing = 10;
     
     CYFEvent *e1 = [CYFEvent new];
     e1.startAt = [NSDate date];

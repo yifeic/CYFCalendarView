@@ -39,6 +39,8 @@ static const int MINUTES_IN_HOUR = 60;
         _editableEventBackgroundColor =[UIColor colorWithRed:0.37f green:0.75f blue:1.00f alpha:1.00f];
         _conflictEventBackgroundColor = [UIColor redColor];
         _timeLabelTrailingSpace = 0;
+        _eventViewLeading = 0;
+        _eventViewTrailing = 0;
     }
     return self;
 }
@@ -118,7 +120,7 @@ static const int MINUTES_IN_HOUR = 60;
         
         UIView *eventView = [self.delegate calendarView:self viewForEvent:event];
         
-        CGRect frame = CGRectMake(self.timelineLeadingToSuperView, top, self.bounds.size.width-self.timelineLeadingToSuperView, bottom-top);
+        CGRect frame = CGRectMake(self.timelineLeadingToSuperView+self.eventViewLeading, top, 1, bottom-top);
         
         BOOL editable = NO;
         if ([self.delegate respondsToSelector:@selector(calendarView:canEditEvent:atIndex:)]) {
@@ -264,6 +266,17 @@ static const int MINUTES_IN_HOUR = 60;
         }
     }
     return NO;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    
+    for (UIView *v in self.eventViews) {
+        CGRect frame = v.frame;
+        CGFloat width = self.frame.size.width - frame.origin.x - self.eventViewTrailing;
+        frame.size.width = width;
+        v.frame = frame;
+    }
 }
 
 @end
