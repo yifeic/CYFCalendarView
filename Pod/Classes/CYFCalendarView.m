@@ -247,19 +247,26 @@ static const int MINUTES_IN_HOUR = 60;
             draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
             draggableView.contentView.backgroundColor = self.editableEventBackgroundColor;
             [self addSubview:draggableView];
-            [self bringSubviewToFront:draggableView];
             [eventViews addObject:draggableView];
         }
         else {
             eventView.frame = frame;
             eventView.backgroundColor = self.eventBackgroundColor;
             [self addSubview:eventView];
-            [self sendSubviewToBack:eventView];
             [eventViews addObject:eventView];
         }
         
     }
     self.eventViews = eventViews;
+    for (UIView *v in eventViews) {
+        if ([v isKindOfClass:[CYFCalendarDraggableView class]]) {
+            CYFCalendarDraggableView *draggableView = (CYFCalendarDraggableView *)v;
+            [self bringSubviewToFront:draggableView];
+            BOOL hasConflict = [self _hasConflictWithOtherEventViews:draggableView];
+            self.hasEventConflict = hasConflict;
+            draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
+        }
+    }
     [self bringSubviewToFront:self.currentTimeline];
 }
 
