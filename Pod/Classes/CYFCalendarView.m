@@ -208,7 +208,7 @@ static const int MINUTES_IN_HOUR = 60;
                         draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
                         
                         BOOL hasConflict = [self _hasConflictWithOtherEventViews:draggableView];
-                        self.hasEventConflict = hasConflict;
+                        self.hasEventConflict = hasConflict; // TODO: only works in some cases
                         draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
                         
                         if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:endTime:ofEvent:atIndex:)]) {
