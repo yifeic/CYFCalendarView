@@ -133,7 +133,6 @@ static const int MINUTES_IN_HOUR = 60;
                 initWithContentView:eventView
                 onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
                     @strongify(self)
-                    [self bringSubviewToFront:draggableView];
                     CGPoint newLocation = [gesture locationInView:self];
                     CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
                     if (gesture.state == UIGestureRecognizerStateChanged) {
@@ -213,12 +212,14 @@ static const int MINUTES_IN_HOUR = 60;
             draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
             draggableView.contentView.backgroundColor = self.editableEventBackgroundColor;
             [self addSubview:draggableView];
+            [self bringSubviewToFront:draggableView];
             [eventViews addObject:draggableView];
         }
         else {
             eventView.frame = frame;
             eventView.backgroundColor = self.eventBackgroundColor;
             [self addSubview:eventView];
+            [self sendSubviewToBack:eventView];
             [eventViews addObject:eventView];
         }
         

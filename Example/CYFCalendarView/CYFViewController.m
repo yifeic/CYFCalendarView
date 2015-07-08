@@ -21,13 +21,13 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     
-    CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 20, 320, 568)];
+    CYFCalendarView *calendarView = [[CYFCalendarView alloc] initWithFrame:CGRectMake(0, 20, 320, 500)];
     [self.view addSubview:calendarView];
     
 
     calendarView.timeLabelTrailingSpace = 10;
     calendarView.eventViewTrailing = 10;
-    
+    calendarView.contentInset = UIEdgeInsetsMake(20, 0, 20, 0);
     CYFEvent *e1 = [CYFEvent new];
     e1.startAt = [NSDate date];
     e1.endAt = [e1.startAt dateByAddingTimeInterval:60*60];
