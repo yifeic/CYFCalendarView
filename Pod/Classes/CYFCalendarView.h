@@ -14,9 +14,8 @@
 @required
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
 @optional
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
 - (BOOL)calendarView:(CYFCalendarView *)calendarView canEditEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeEndTime:(NSDate *)endTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
+/// If startTime or endTime is nil, it's unchanged.
 - (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime endTime:(NSDate *)endTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
 @end
 

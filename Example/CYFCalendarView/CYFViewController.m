@@ -62,8 +62,9 @@
     return v;
 }
 
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime endTime:(NSDate *)endTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
     NSLog(@"didChangeStartTime %@ of event at index %ld", startTime, index);
+    NSLog(@"didChangeEndTime %@ of event at index %ld", endTime, index);
 }
 
 - (BOOL)calendarView:(CYFCalendarView *)calendarView canEditEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {

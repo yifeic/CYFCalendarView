@@ -150,8 +150,8 @@ static const int MINUTES_IN_HOUR = 60;
                         draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
                         
                         if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:endTime:ofEvent:atIndex:)]) {
-                            CGFloat bottom = CGRectGetMaxY(draggableView.frame);
-                            NSDate *startTime = [self _dateFromY:top];
+                            CGFloat bottom = CGRectGetMaxY(draggableView.frame)-draggableView.contentViewInsets.bottom;
+                            NSDate *startTime = [self _dateFromY:destTop];
                             NSDate *endTime = [self _dateFromY:bottom];
                             [self.delegate calendarView:self didChangeStartTime:startTime endTime:endTime ofEvent:event atIndex:i];
                         }
@@ -177,9 +177,9 @@ static const int MINUTES_IN_HOUR = 60;
                         self.hasEventConflict = hasConflict;
                         draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
                         
-                        if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:ofEvent:atIndex:)]) {
+                        if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:endTime:ofEvent:atIndex:)]) {
                             NSDate *startTime = [self _dateFromY:destTop];
-                            [self.delegate calendarView:self didChangeStartTime:startTime ofEvent:event atIndex:i];
+                            [self.delegate calendarView:self didChangeStartTime:startTime endTime:nil ofEvent:event atIndex:i];
                         }
                     }
                 }
@@ -203,9 +203,9 @@ static const int MINUTES_IN_HOUR = 60;
                         self.hasEventConflict = hasConflict;
                         draggableView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
                         
-                        if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEndTime:ofEvent:atIndex:)]) {
+                        if ([self.delegate respondsToSelector:@selector(calendarView:didChangeStartTime:endTime:ofEvent:atIndex:)]) {
                             NSDate *endTime = [self _dateFromY:destBottom];
-                            [self.delegate calendarView:self didChangeEndTime:endTime ofEvent:event atIndex:i];
+                            [self.delegate calendarView:self didChangeStartTime:nil endTime:endTime ofEvent:event atIndex:i];
                         }
                     }
                 }];
