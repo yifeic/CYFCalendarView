@@ -312,7 +312,7 @@ static const int MINUTES_IN_HOUR = 60;
     self.draggableEventView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
 }
 
-- (void)centerDraggableView {
+- (void)centerEditableEventView {
     [self scrollRectToVisible:self.draggableEventView.frame animated:NO];
 }
 
