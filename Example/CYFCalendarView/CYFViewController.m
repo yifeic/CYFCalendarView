@@ -11,7 +11,7 @@
 #import "CYFEvent.h"
 
 @interface CYFViewController () <CYFCalendarViewDelegate>
-
+@property (nonatomic, strong) CYFCalendarView *calView;
 @end
 
 @implementation CYFViewController
@@ -31,44 +31,50 @@
     CYFEvent *e1 = [CYFEvent new];
     e1.startAt = [NSDate date];
     e1.endAt = [e1.startAt dateByAddingTimeInterval:60*60];
-    e1.editable = YES;
+
     
     CYFEvent *e2 = [CYFEvent new];
     e2.startAt = [e1.endAt dateByAddingTimeInterval:60*60];
     e2.endAt = [e2.startAt dateByAddingTimeInterval:60*30];
-//    e2.editable = YES;
+
     
-    calendarView.events = @[e1, e2];
+    calendarView.events = @[e1];
     calendarView.day = [NSDate date];
+    calendarView.editableEvent = e2;
     
     calendarView.delegate = self;
     
     [calendarView reloadTimelines];
     [calendarView reloadEvents];
     
+    self.calView = calendarView;
+    
 }
 
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
     UIView *v = [[UIView alloc] init];
-    
-    if ([(CYFEvent *)event editable]) {
-    }
-    else {
-        v.layer.borderColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0].CGColor;
-        v.layer.borderWidth = 1;
-    }
     v.layer.cornerRadius = 3;
-    
+    v.layer.borderColor = [UIColor colorWithRed:229.0/255.0 green:229.0/255.0 blue:229.0/255.0 alpha:1.0].CGColor;
+    v.layer.borderWidth = 1;
     return v;
 }
 
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime endTime:(NSDate *)endTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
-    NSLog(@"didChangeStartTime %@ of event at index %ld", startTime, index);
-    NSLog(@"didChangeEndTime %@ of event at index %ld", endTime, index);
+- (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEditableEvent:(id<CYFCalendarEvent>)event {
+    UIView *v = [[UIView alloc] init];
+    v.layer.cornerRadius = 3;
+    return v;
 }
 
-- (BOOL)calendarView:(CYFCalendarView *)calendarView canEditEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
-    return [(CYFEvent *)event editable];
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime endTime:(NSDate *)endTime{
+    NSLog(@"didChangeStartTime %@ of event", startTime);
+    NSLog(@"didChangeEndTime %@ of event", endTime);
 }
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    [self.calView centerDraggableView];
+
+}
+
 
 @end

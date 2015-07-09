@@ -13,10 +13,11 @@
 @protocol CYFCalendarViewDelegate <UIScrollViewDelegate>
 @required
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
+- (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEditableEvent:(id<CYFCalendarEvent>)event;
+
 @optional
-- (BOOL)calendarView:(CYFCalendarView *)calendarView canEditEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
 /// If startTime or endTime is nil, it's unchanged.
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeStartTime:(NSDate *)startTime endTime:(NSDate *)endTime ofEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index;
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime endTime:(NSDate *)endTime;
 @end
 
 @interface CYFCalendarView : UIScrollView
@@ -41,6 +42,7 @@
 /// Array of CYFCalendarEvent.
 @property (nonatomic, strong) NSArray *events;
 @property (nonatomic, strong) NSDate *day;
+@property (nonatomic, strong) id<CYFCalendarEvent> editableEvent;
 
 /// Event views properties. Set up these before calling reloadData.
 @property (nonatomic, strong) UIColor *eventBackgroundColor;
@@ -48,7 +50,7 @@
 @property (nonatomic, strong) UIColor *conflictEventBackgroundColor;
 
 - (instancetype)initWithFrame:(CGRect)frame;
-
+- (void)centerDraggableView;
 - (void)reloadEvents;
 - (void)reloadTimelines;
 
