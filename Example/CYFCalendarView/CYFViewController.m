@@ -72,7 +72,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.calView centerDraggableView];
+    [self.calView centerEditableEventView];
 
 }
 
