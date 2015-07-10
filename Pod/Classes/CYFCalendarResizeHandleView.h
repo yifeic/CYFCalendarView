@@ -10,6 +10,6 @@
 
 @interface CYFCalendarResizeHandleView : UIView
 
-- (instancetype)initWithHandleSize:(CGFloat)size;
+@property (nonatomic) CGFloat handleSize;
 
 @end

@@ -35,6 +35,7 @@
 @property (nonatomic) CGFloat timelineLeadingToSuperView;
 @property (nonatomic) CGFloat eventViewTrailing;
 @property (nonatomic) CGFloat eventViewLeading;
+@property (nonatomic) CGFloat eventViewHandleSize;
 @property (nonatomic, strong) UIFont *timeLabelFont;
 @property (nonatomic, strong) UIColor *timeLabelColor;
 @property (nonatomic, strong) UIColor *currentTimelineColor;

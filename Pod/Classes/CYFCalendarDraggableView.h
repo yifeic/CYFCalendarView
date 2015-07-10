@@ -19,6 +19,7 @@ typedef void(^CYFCalendarDraggableViewDragBlock)(CYFCalendarDraggableView *dragg
 @property (nonatomic, readonly) CGRect contentFrame;
 @property (nonatomic, readonly) UIEdgeInsets contentViewInsets;
 @property (nonatomic, strong, readonly) UIView *contentView;
+@property (nonatomic) CGFloat handleSize;
 
 - (instancetype)initWithContentView:(UIView *)view onDrag:(CYFCalendarDraggableViewDragBlock)onDrag onResizeTop:(CYFCalendarDraggableViewDragBlock)onResizeTop onResizeBottom:(CYFCalendarDraggableViewDragBlock)onResizeBottom;
 

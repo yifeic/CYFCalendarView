@@ -23,7 +23,6 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 @property (nonatomic, readwrite) CGPoint dragBeginPointInSuperview;
 @property (nonatomic, readwrite) CGPoint dragBeginCenter;
 @property (nonatomic, readwrite) CGRect dragBeginFrame;
-@property (nonatomic, readonly) CGFloat handleSize;
 @property (nonatomic, readonly) CGFloat handleTouchSize;
 @property (nonatomic, weak) CYFCalendarResizeHandleView *topResizeHandle;
 @property (nonatomic, weak) CYFCalendarResizeHandleView *bottomResizeHandle;
@@ -40,7 +39,6 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         _onDrag = onDrag;
         _onResizeTop = onResizeTop;
         _onResizeBottom = onResizeBottom;
-        _handleSize = 10;
         _handleTouchSize = 44;
         _contentViewInsets = UIEdgeInsetsMake(self.handleTouchSize/2, 0, self.handleTouchSize/2, 0);
         
@@ -65,23 +63,23 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 }
 
 - (void)setupResizeHandle {
-    CGFloat handleSize = self.handleTouchSize;
+    CGFloat handleTouchSize = self.handleTouchSize;
     CGFloat handleMargin = 0;
     
-    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:16];
+    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithFrame:CGRectZero];
     topHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:topHandle];
     NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleSize] options:0 metrics:nil views:viewDict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleSize] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleTouchSize] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleTouchSize] options:0 metrics:nil views:viewDict]];
     self.topResizeHandle = topHandle;
     
-    CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithHandleSize:16];
+    CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithFrame:CGRectZero];
     bottomHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:bottomHandle];
     viewDict = NSDictionaryOfVariableBindings(bottomHandle);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[bottomHandle(%f)]-%f-|", handleSize, handleMargin] options:0 metrics:nil views:viewDict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[bottomHandle(%f)]|", handleSize] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[bottomHandle(%f)]-%f-|", handleTouchSize, handleMargin] options:0 metrics:nil views:viewDict]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[bottomHandle(%f)]|", handleTouchSize] options:0 metrics:nil views:viewDict]];
     self.bottomResizeHandle = bottomHandle;
 }
 
@@ -118,6 +116,15 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 
 - (CGRect)contentFrame {
     return UIEdgeInsetsInsetRect(self.frame, self.contentViewInsets);
+}
+
+- (void)setHandleSize:(CGFloat)handleSize {
+    self.topResizeHandle.handleSize = handleSize;
+    self.bottomResizeHandle.handleSize = handleSize;
+}
+
+- (CGFloat)handleSize {
+    return self.topResizeHandle.handleSize;
 }
 
 @end

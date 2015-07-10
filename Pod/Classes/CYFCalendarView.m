@@ -45,6 +45,7 @@ static const int MINUTES_IN_HOUR = 60;
         _eventViewLeading = 0;
         _eventViewTrailing = 0;
         _currentTimelineColor = [UIColor redColor];
+        _eventViewHandleSize = 10;
         
         // current timeline
         _currentTimeline = [[UIView alloc] initWithFrame:CGRectZero];
@@ -257,6 +258,7 @@ static const int MINUTES_IN_HOUR = 60;
         [self addSubview:draggableView];
         [self bringSubviewToFront:draggableView];
         self.draggableEventView = draggableView;
+        self.draggableEventView.handleSize = self.eventViewHandleSize;
     }
     
     [self checkDraggableEventViewConflict];

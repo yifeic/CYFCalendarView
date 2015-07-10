@@ -27,6 +27,7 @@
 
     calendarView.timeLabelTrailingSpace = 10;
     calendarView.eventViewTrailing = 10;
+    calendarView.eventViewHandleSize = 10;
     calendarView.contentInset = UIEdgeInsetsMake(20, 0, 20, 0);
     CYFEvent *e1 = [CYFEvent new];
     e1.startAt = [NSDate date];
