@@ -262,8 +262,6 @@ static const int MINUTES_IN_HOUR = 60;
     }
     
     [self checkDraggableEventViewConflict];
-
-    [self bringSubviewToFront:self.currentTimeline];
 }
 
 - (void)setDay:(NSDate *)day {
