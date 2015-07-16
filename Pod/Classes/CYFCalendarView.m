@@ -330,9 +330,14 @@ static const int MINUTES_IN_HOUR = 60;
 - (void)layoutSubviews {
     [super layoutSubviews];
     
-    NSArray *subviews = self.eventViews;
+    NSMutableArray *subviews = [NSMutableArray array];
+    
+    if (self.eventViews.count > 0) {
+        [subviews addObjectsFromArray:self.eventViews];
+    }
+    
     if (self.draggableEventView) {
-        subviews = [subviews arrayByAddingObject:self.draggableEventView];
+        [subviews addObject:self.draggableEventView];
     }
     
     for (UIView *v in subviews) {
