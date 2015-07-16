@@ -15,6 +15,8 @@ static const int MINUTES_IN_HOUR = 60;
 
 @interface CYFCalendarView () {
     NSDate *_day;
+    id<CYFCalendarEvent> _editableEvent;
+    NSArray *_events;
 }
 
 @property (nonatomic, strong, readonly) NSArray *timelines;
@@ -131,7 +133,7 @@ static const int MINUTES_IN_HOUR = 60;
     self.currentTimeline.frame = CGRectMake(self.timelineLeadingToSuperView, y, self.frame.size.width-self.timelineLeadingToSuperView, self.timelineHeight);
 }
 
-- (void)reloadEvents {
+- (void)reloadEventViews {
     NSAssert(self.events != nil, @"events property cannot be nil");
     NSAssert(self.day != nil, @"day property cannot be nil");
     
@@ -139,8 +141,6 @@ static const int MINUTES_IN_HOUR = 60;
         [view removeFromSuperview];
     }
     self.eventViews = @[];
-    [self.draggableEventView removeFromSuperview];
-    self.draggableEventView = nil;
     
     if ([[NSCalendar currentCalendar] isDateInToday:self.day]) {
         [self startUpdatingCurrentTimeline];
@@ -148,8 +148,6 @@ static const int MINUTES_IN_HOUR = 60;
     else {
         [self stopUpdatingCurrentTimeline];
     }
-    
-    @weakify(self)
     
     // non-editable events view
     NSMutableArray *eventViews = [NSMutableArray arrayWithCapacity:self.events.count];
@@ -169,98 +167,6 @@ static const int MINUTES_IN_HOUR = 60;
     }
     self.eventViews = eventViews;
 
-    // editable event view
-    if (self.editableEvent) {
-        CGFloat top = [self _yFromDate:self.editableEvent.startAt];
-        CGFloat bottom = [self _yFromDate:self.editableEvent.endAt];
-        
-        UIView *eventView = [self.delegate calendarView:self viewForEditableEvent:self.editableEvent];
-        
-        CGRect frame = CGRectMake(self.timelineLeadingToSuperView+self.eventViewLeading, top, 1, bottom-top);
-    
-        CYFCalendarDraggableView *draggableView =
-        [[CYFCalendarDraggableView alloc]
-            initWithContentView:eventView
-            onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                @strongify(self)
-                CGPoint newLocation = [gesture locationInView:self];
-                CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                if (gesture.state == UIGestureRecognizerStateChanged) {
-                    draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
-                }
-                else {
-                    CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
-                    CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
-                    dy += destTop - top;
-                    draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
-                    
-                    [self checkDraggableEventViewConflict];
-                    
-                    if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                        CGFloat bottom = CGRectGetMaxY(draggableView.frame)-draggableView.contentViewInsets.bottom;
-                        NSDate *startTime = [self _dateFromY:destTop];
-                        NSDate *endTime = [self _dateFromY:bottom];
-                        [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:endTime];
-                    }
-                }
-            }
-            onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                @strongify(self)
-                CGPoint newLocation = [gesture locationInView:self];
-                CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                
-                dy = MIN(dy, CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom);
-                
-                if (gesture.state == UIGestureRecognizerStateChanged) {
-                    draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
-                }
-                else {
-                    CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
-                    CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
-                    dy += destTop - top;
-                    draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
-                    
-                    [self checkDraggableEventViewConflict];
-                    
-                    if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                        NSDate *startTime = [self _dateFromY:destTop];
-                        [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:nil];
-                    }
-                }
-            }
-            onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-                @strongify(self)
-                CGPoint newLocation = [gesture locationInView:self];
-                CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-                
-                dy = MAX(dy, -(CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom));
-                
-                if (gesture.state == UIGestureRecognizerStateChanged) {
-                    draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
-                }
-                else {
-                    CGFloat bottom = CGRectGetMaxY(draggableView.dragBeginFrame) + dy - draggableView.contentViewInsets.bottom;
-                    CGFloat destBottom = roundf(bottom / self.minVerticalStep) * self.minVerticalStep;
-                    dy += destBottom - bottom;
-                    draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
-                    
-                    [self checkDraggableEventViewConflict];
-                    
-                    if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                        NSDate *endTime = [self _dateFromY:destBottom];
-                        [self.delegate calendarView:self didChangeEventStartTime:nil endTime:endTime];
-                    }
-                }
-            }];
-        UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
-        draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
-        draggableView.contentView.backgroundColor = self.editableEventBackgroundColor;
-        [self addSubview:draggableView];
-        [self bringSubviewToFront:draggableView];
-        self.draggableEventView = draggableView;
-        self.draggableEventView.handleSize = self.eventViewHandleSize;
-    }
-    
     [self checkDraggableEventViewConflict];
 }
 
@@ -271,6 +177,107 @@ static const int MINUTES_IN_HOUR = 60;
 
 - (NSDate *)day {
     return _day;
+}
+
+- (void)reloadEditableEventView {
+    if (!self.editableEvent) {
+        return;
+    }
+    
+    [self.draggableEventView removeFromSuperview];
+    self.draggableEventView = nil;
+    
+    CGFloat top = [self _yFromDate:self.editableEvent.startAt];
+    CGFloat bottom = [self _yFromDate:self.editableEvent.endAt];
+    
+    UIView *eventView = [self.delegate calendarView:self viewForEditableEvent:self.editableEvent];
+    
+    CGRect frame = CGRectMake(self.timelineLeadingToSuperView+self.eventViewLeading, top, 1, bottom-top);
+
+    @weakify(self)
+    CYFCalendarDraggableView *draggableView =
+    [[CYFCalendarDraggableView alloc]
+        initWithContentView:eventView
+        onDrag:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+            @strongify(self)
+            CGPoint newLocation = [gesture locationInView:self];
+            CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+            if (gesture.state == UIGestureRecognizerStateChanged) {
+                draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+            }
+            else {
+                CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
+                CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
+                dy += destTop - top;
+                draggableView.center = CGPointMake(draggableView.dragBeginCenter.x, draggableView.dragBeginCenter.y+dy);
+                
+                [self checkDraggableEventViewConflict];
+                
+                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
+                    CGFloat bottom = CGRectGetMaxY(draggableView.frame)-draggableView.contentViewInsets.bottom;
+                    NSDate *startTime = [self _dateFromY:destTop];
+                    NSDate *endTime = [self _dateFromY:bottom];
+                    [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:endTime];
+                }
+            }
+        }
+        onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+            @strongify(self)
+            CGPoint newLocation = [gesture locationInView:self];
+            CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+            
+            dy = MIN(dy, CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom);
+            
+            if (gesture.state == UIGestureRecognizerStateChanged) {
+                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+            }
+            else {
+                CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
+                CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
+                dy += destTop - top;
+                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+                
+                [self checkDraggableEventViewConflict];
+                
+                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
+                    NSDate *startTime = [self _dateFromY:destTop];
+                    [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:nil];
+                }
+            }
+        }
+        onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
+            @strongify(self)
+            CGPoint newLocation = [gesture locationInView:self];
+            CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+            
+            dy = MAX(dy, -(CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom));
+            
+            if (gesture.state == UIGestureRecognizerStateChanged) {
+                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
+            }
+            else {
+                CGFloat bottom = CGRectGetMaxY(draggableView.dragBeginFrame) + dy - draggableView.contentViewInsets.bottom;
+                CGFloat destBottom = roundf(bottom / self.minVerticalStep) * self.minVerticalStep;
+                dy += destBottom - bottom;
+                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(0, 0, -dy, 0));
+                
+                [self checkDraggableEventViewConflict];
+                
+                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
+                    NSDate *endTime = [self _dateFromY:destBottom];
+                    [self.delegate calendarView:self didChangeEventStartTime:nil endTime:endTime];
+                }
+            }
+        }];
+    UIEdgeInsets insets = UIEdgeInsetsMake(-draggableView.contentViewInsets.top, -draggableView.contentViewInsets.left, -draggableView.contentViewInsets.bottom, -draggableView.contentViewInsets.right);
+    draggableView.frame = UIEdgeInsetsInsetRect(frame, insets);
+    draggableView.contentView.backgroundColor = self.editableEventBackgroundColor;
+    [self addSubview:draggableView];
+    [self bringSubviewToFront:draggableView];
+    self.draggableEventView = draggableView;
+    self.draggableEventView.handleSize = self.eventViewHandleSize;
+    
+    [self checkDraggableEventViewConflict];
 }
 
 - (CGFloat)_yFromDate:(NSDate *)date {
@@ -295,19 +302,20 @@ static const int MINUTES_IN_HOUR = 60;
 
 - (void)checkDraggableEventViewConflict {
     BOOL hasConflict = NO;
-    CGRect thisFrame = self.draggableEventView.contentFrame;
-    for (UIView *view in self.eventViews) {
-        CGRect thatFrame = view.frame;
-        if (CGRectIntersectsRect(thisFrame, thatFrame)) {
+    if (self.draggableEventView && self.eventViews.count > 0) {
+        CGRect thisFrame = self.draggableEventView.contentFrame;
+        for (UIView *view in self.eventViews) {
+            CGRect thatFrame = view.frame;
+            if (CGRectIntersectsRect(thisFrame, thatFrame)) {
+                hasConflict = YES;
+                break;
+            }
+        }
+        
+        if (!self.currentTimeline.hidden && CGRectGetMinY(thisFrame) < CGRectGetMinY(self.currentTimeline.frame)) {
             hasConflict = YES;
-            break;
         }
     }
-    
-    if (!self.currentTimeline.hidden && CGRectGetMinY(thisFrame) < CGRectGetMinY(self.currentTimeline.frame)) {
-        hasConflict = YES;
-    }
-    
     self.hasEventConflict = hasConflict;
     self.draggableEventView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
 }

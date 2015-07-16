@@ -52,7 +52,7 @@
 
 - (instancetype)initWithFrame:(CGRect)frame;
 - (void)scrollToEditableEventView;
-- (void)reloadEvents;
 - (void)reloadTimelines;
-
+- (void)reloadEventViews;
+- (void)reloadEditableEventView;
 @end

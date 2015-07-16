@@ -38,18 +38,16 @@
     e2.startAt = [e1.endAt dateByAddingTimeInterval:60*60];
     e2.endAt = [e2.startAt dateByAddingTimeInterval:60*30];
 
-    
-    calendarView.events = @[e2];
-    calendarView.day = [NSDate date];
-    calendarView.editableEvent = e1;
-    
     calendarView.delegate = self;
     
+    calendarView.day = [NSDate date];
+    calendarView.events = @[e2];
+    calendarView.editableEvent = e1;
+    
     [calendarView reloadTimelines];
-    [calendarView reloadEvents];
-    
+    [calendarView reloadEventViews];
+    [calendarView reloadEditableEventView];
     self.calView = calendarView;
-    
 }
 
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEvent:(id<CYFCalendarEvent>)event atIndex:(NSInteger)index {
@@ -73,9 +71,8 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+
     [self.calView scrollToEditableEventView];
-
 }
-
 
 @end
