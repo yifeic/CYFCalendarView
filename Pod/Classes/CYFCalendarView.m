@@ -312,8 +312,11 @@ static const int MINUTES_IN_HOUR = 60;
     self.draggableEventView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
 }
 
-- (void)centerEditableEventView {
-    [self scrollRectToVisible:self.draggableEventView.frame animated:NO];
+- (void)scrollToEditableEventView {
+    CGFloat top = CGRectGetMinY(self.draggableEventView.frame);
+    CGFloat y = MAX(top - 50, -self.contentInset.top);
+    y = MIN(y, self.contentSize.height-CGRectGetHeight(self.frame)+self.contentInset.bottom);
+    self.contentOffset = CGPointMake(0, y);
 }
 
 - (void)layoutSubviews {

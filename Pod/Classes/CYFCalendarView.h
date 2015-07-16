@@ -51,7 +51,7 @@
 @property (nonatomic, strong) UIColor *conflictEventBackgroundColor;
 
 - (instancetype)initWithFrame:(CGRect)frame;
-- (void)centerEditableEventView;
+- (void)scrollToEditableEventView;
 - (void)reloadEvents;
 - (void)reloadTimelines;
 

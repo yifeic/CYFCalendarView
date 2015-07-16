@@ -39,9 +39,9 @@
     e2.endAt = [e2.startAt dateByAddingTimeInterval:60*30];
 
     
-    calendarView.events = @[e1];
+    calendarView.events = @[e2];
     calendarView.day = [NSDate date];
-    calendarView.editableEvent = e2;
+    calendarView.editableEvent = e1;
     
     calendarView.delegate = self;
     
@@ -73,7 +73,7 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [self.calView centerEditableEventView];
+    [self.calView scrollToEditableEventView];
 
 }
 
