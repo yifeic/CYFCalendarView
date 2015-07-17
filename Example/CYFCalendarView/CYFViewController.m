@@ -41,7 +41,7 @@
     calendarView.delegate = self;
     
     calendarView.day = [NSDate date];
-    calendarView.events = @[e2];
+//    calendarView.events = @[e2];
     calendarView.editableEvent = e1;
     
     [calendarView reloadTimelines];

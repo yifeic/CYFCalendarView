@@ -48,6 +48,7 @@ static const int MINUTES_IN_HOUR = 60;
         _eventViewTrailing = 0;
         _currentTimelineColor = [UIColor redColor];
         _eventViewHandleSize = 10;
+        _events = @[];
         
         // current timeline
         _currentTimeline = [[UIView alloc] initWithFrame:CGRectZero];
@@ -302,8 +303,8 @@ static const int MINUTES_IN_HOUR = 60;
 
 - (void)checkDraggableEventViewConflict {
     BOOL hasConflict = NO;
+    CGRect thisFrame = self.draggableEventView.contentFrame;
     if (self.draggableEventView && self.eventViews.count > 0) {
-        CGRect thisFrame = self.draggableEventView.contentFrame;
         for (UIView *view in self.eventViews) {
             CGRect thatFrame = view.frame;
             if (CGRectIntersectsRect(thisFrame, thatFrame)) {
@@ -311,10 +312,9 @@ static const int MINUTES_IN_HOUR = 60;
                 break;
             }
         }
-        
-        if (!self.currentTimeline.hidden && CGRectGetMinY(thisFrame) < CGRectGetMinY(self.currentTimeline.frame)) {
-            hasConflict = YES;
-        }
+    }
+    if (!self.currentTimeline.hidden && CGRectGetMinY(thisFrame) < CGRectGetMinY(self.currentTimeline.frame)) {
+        hasConflict = YES;
     }
     self.hasEventConflict = hasConflict;
     self.draggableEventView.contentView.backgroundColor = hasConflict ? self.conflictEventBackgroundColor : self.editableEventBackgroundColor;
