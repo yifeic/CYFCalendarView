@@ -25,8 +25,9 @@ static const int MINUTES_IN_HOUR = 60;
 @property (nonatomic) CGFloat minVerticalStep;
 @property (nonatomic, strong) NSDate *beginOfDay;
 @property (nonatomic, readwrite) BOOL hasEventConflict;
-@property (nonatomic, readonly) UIView *currentTimeline;
+@property (nonatomic, strong) UIView *currentTimeline;
 @property (nonatomic, strong) NSTimer *timer;
+@property (nonatomic, strong) NSLayoutConstraint *currentTimelineTop;
 @end
 
 @implementation CYFCalendarView
@@ -50,13 +51,26 @@ static const int MINUTES_IN_HOUR = 60;
         _eventViewHandleSize = 10;
         _events = @[];
         
-        // current timeline
-        _currentTimeline = [[UIView alloc] initWithFrame:CGRectZero];
-        [self addSubview:_currentTimeline];
-        self.currentTimeline.backgroundColor = self.currentTimelineColor;
-        self.currentTimeline.hidden = YES;
+        [self setupCurrentTimeline];
     }
     return self;
+}
+
+- (void)setupCurrentTimeline {
+    // current timeline
+    UIView *currentTimeline = [[UIView alloc] initWithFrame:CGRectZero];
+    currentTimeline.translatesAutoresizingMaskIntoConstraints = NO;
+    [self addSubview:currentTimeline];
+    currentTimeline.backgroundColor = self.currentTimelineColor;
+    currentTimeline.hidden = YES;
+    self.currentTimeline = currentTimeline;
+    
+    NSLayoutConstraint *leading = [NSLayoutConstraint constraintWithItem:currentTimeline attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0 constant:self.timelineLeadingToSuperView];
+    NSLayoutConstraint *trailing = [NSLayoutConstraint constraintWithItem:currentTimeline attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0 constant:0];
+    NSLayoutConstraint *top = [NSLayoutConstraint constraintWithItem:currentTimeline attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0 constant:0];
+    NSLayoutConstraint *height = [NSLayoutConstraint constraintWithItem:currentTimeline attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1.0 constant:self.timelineHeight];
+    [self addConstraints:@[leading, trailing, top, height]];
+    self.currentTimelineTop = top;
 }
 
 - (void)reloadTimelines {
@@ -82,7 +96,7 @@ static const int MINUTES_IN_HOUR = 60;
         
         // configure timeline
         UIView *timeline = [[UIView alloc] initWithFrame:CGRectZero];
-        [self addSubview:timeline];
+        [self insertSubview:timeline belowSubview:self.currentTimeline];
         timeline.backgroundColor = timelineColor;
         
         // timeline constraints
@@ -131,7 +145,7 @@ static const int MINUTES_IN_HOUR = 60;
 
 - (void)onTimer:(NSTimer *)timer {
     CGFloat y = [self _yFromDate:[NSDate date]];
-    self.currentTimeline.frame = CGRectMake(self.timelineLeadingToSuperView, y, self.frame.size.width-self.timelineLeadingToSuperView, self.timelineHeight);
+    self.currentTimelineTop.constant = y;
 }
 
 - (void)reloadEventViews {
