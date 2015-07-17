@@ -142,14 +142,7 @@ static const int MINUTES_IN_HOUR = 60;
         [view removeFromSuperview];
     }
     self.eventViews = @[];
-    
-    if ([[NSCalendar currentCalendar] isDateInToday:self.day]) {
-        [self startUpdatingCurrentTimeline];
-    }
-    else {
-        [self stopUpdatingCurrentTimeline];
-    }
-    
+
     // non-editable events view
     NSMutableArray *eventViews = [NSMutableArray arrayWithCapacity:self.events.count];
     for (NSInteger i = 0; i < self.events.count; i++) {
@@ -174,6 +167,12 @@ static const int MINUTES_IN_HOUR = 60;
 - (void)setDay:(NSDate *)day {
     _day = day;
     self.beginOfDay = [self _beginOfDay:day];
+    if ([[NSCalendar currentCalendar] isDateInToday:self.day]) {
+        [self startUpdatingCurrentTimeline];
+    }
+    else {
+        [self stopUpdatingCurrentTimeline];
+    }
 }
 
 - (NSDate *)day {
