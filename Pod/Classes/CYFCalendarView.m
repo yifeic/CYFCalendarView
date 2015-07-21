@@ -170,7 +170,13 @@ static const int MINUTES_IN_HOUR = 60;
         CGRect frame = CGRectMake(self.timelineLeadingToSuperView+self.eventViewLeading, top, 1, bottom-top);
         eventView.frame = frame;
         eventView.backgroundColor = self.eventBackgroundColor;
-        [self addSubview:eventView];
+        
+        if (self.draggableEventView && self.draggableEventView.superview == self) {
+            [self insertSubview:eventView belowSubview:self.draggableEventView];
+        }
+        else {
+            [self addSubview:eventView];
+        }
         [eventViews addObject:eventView];
     }
     self.eventViews = eventViews;
