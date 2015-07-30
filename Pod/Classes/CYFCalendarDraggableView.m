@@ -11,7 +11,6 @@
 
 typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
     CYFCalendarDraggableViewTouchAreaContent,
-    CYFCalendarDraggableViewTouchAreaTopHandle,
     CYFCalendarDraggableViewTouchAreaBottomHandle,
 };
 
@@ -40,7 +39,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         _onResizeTop = onResizeTop;
         _onResizeBottom = onResizeBottom;
         _handleTouchSize = 44;
-        _contentViewInsets = UIEdgeInsetsMake(self.handleTouchSize/2, 0, self.handleTouchSize/2, 0);
+        _contentViewInsets = UIEdgeInsetsMake(0, 0, self.handleTouchSize/2, 0);
         
         _panGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(drag:)];
         _panGestureRecognizer.minimumPressDuration = 0;
@@ -66,18 +65,18 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
     CGFloat handleTouchSize = self.handleTouchSize;
     CGFloat handleMargin = 0;
     
-    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithFrame:CGRectZero];
-    topHandle.translatesAutoresizingMaskIntoConstraints = NO;
-    [self addSubview:topHandle];
-    NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleTouchSize] options:0 metrics:nil views:viewDict]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleTouchSize] options:0 metrics:nil views:viewDict]];
-    self.topResizeHandle = topHandle;
+//    CYFCalendarResizeHandleView *topHandle = [[CYFCalendarResizeHandleView alloc] initWithFrame:CGRectZero];
+//    topHandle.translatesAutoresizingMaskIntoConstraints = NO;
+//    [self addSubview:topHandle];
+//    NSDictionary *viewDict = NSDictionaryOfVariableBindings(topHandle);
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"|-%f-[topHandle(%f)]", handleMargin, handleTouchSize] options:0 metrics:nil views:viewDict]];
+//    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|[topHandle(%f)]", handleTouchSize] options:0 metrics:nil views:viewDict]];
+//    self.topResizeHandle = topHandle;
     
     CYFCalendarResizeHandleView *bottomHandle = [[CYFCalendarResizeHandleView alloc] initWithFrame:CGRectZero];
     bottomHandle.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:bottomHandle];
-    viewDict = NSDictionaryOfVariableBindings(bottomHandle);
+    NSDictionary *viewDict = NSDictionaryOfVariableBindings(bottomHandle);
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"[bottomHandle(%f)]-%f-|", handleTouchSize, handleMargin] options:0 metrics:nil views:viewDict]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:[NSString stringWithFormat:@"V:[bottomHandle(%f)]|", handleTouchSize] options:0 metrics:nil views:viewDict]];
     self.bottomResizeHandle = bottomHandle;
@@ -85,10 +84,7 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
 
 - (void)drag:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        if ([self.topResizeHandle pointInside:[gesture locationInView:self.topResizeHandle] withEvent:nil]) {
-            self.touchBeginArea = CYFCalendarDraggableViewTouchAreaTopHandle;
-        }
-        else if ([self.bottomResizeHandle pointInside:[gesture locationInView:self.bottomResizeHandle] withEvent:nil]) {
+        if ([self.bottomResizeHandle pointInside:[gesture locationInView:self.bottomResizeHandle] withEvent:nil]) {
             self.touchBeginArea = CYFCalendarDraggableViewTouchAreaBottomHandle;
         }
         else {
@@ -103,9 +99,6 @@ typedef NS_ENUM(NSUInteger, CYFCalendarDraggableViewTouchArea) {
         switch (self.touchBeginArea) {
             case CYFCalendarDraggableViewTouchAreaContent:
                 self.onDrag(self, gesture);
-                break;
-            case CYFCalendarDraggableViewTouchAreaTopHandle:
-                self.onResizeTop(self, gesture);
                 break;
             case CYFCalendarDraggableViewTouchAreaBottomHandle:
                 self.onResizeBottom(self, gesture);

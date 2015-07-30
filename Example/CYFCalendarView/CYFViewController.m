@@ -64,9 +64,12 @@
     return v;
 }
 
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime endTime:(NSDate *)endTime{
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime {
     NSLog(@"didChangeStartTime %@ of event", startTime);
-    NSLog(@"didChangeEndTime %@ of event", endTime);
+}
+
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventLength:(NSInteger)minutes {
+    NSLog(@"didChangeEventLength %ld minutes", (long)minutes);
 }
 
 - (void)viewDidAppear:(BOOL)animated {

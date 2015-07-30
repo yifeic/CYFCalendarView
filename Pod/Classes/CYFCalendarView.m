@@ -233,37 +233,35 @@ static const int MINUTES_IN_HOUR = 60;
                 
                 [self checkDraggableEventViewConflict];
                 
-                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                    CGFloat bottom = CGRectGetMaxY(draggableView.frame)-draggableView.contentViewInsets.bottom;
+                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:)]) {
                     NSDate *startTime = [self _dateFromY:destTop];
-                    NSDate *endTime = [self _dateFromY:bottom];
-                    [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:endTime];
+                    [self.delegate calendarView:self didChangeEventStartTime:startTime];
                 }
             }
         }
         onResizeTop:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
-            @strongify(self)
-            CGPoint newLocation = [gesture locationInView:self];
-            CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
-            
-            dy = MIN(dy, CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom);
-            
-            if (gesture.state == UIGestureRecognizerStateChanged) {
-                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
-            }
-            else {
-                CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
-                CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
-                dy += destTop - top;
-                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
-                
-                [self checkDraggableEventViewConflict];
-                
-                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                    NSDate *startTime = [self _dateFromY:destTop];
-                    [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:nil];
-                }
-            }
+//            @strongify(self)
+//            CGPoint newLocation = [gesture locationInView:self];
+//            CGFloat dy = newLocation.y - draggableView.dragBeginPointInSuperview.y;
+//            
+//            dy = MIN(dy, CGRectGetHeight(draggableView.dragBeginFrame) - self.minVerticalStep - draggableView.contentViewInsets.top - draggableView.contentViewInsets.bottom);
+//            
+//            if (gesture.state == UIGestureRecognizerStateChanged) {
+//                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+//            }
+//            else {
+//                CGFloat top = CGRectGetMinY(draggableView.dragBeginFrame) + dy + draggableView.contentViewInsets.top;
+//                CGFloat destTop = roundf(top / self.minVerticalStep) * self.minVerticalStep;
+//                dy += destTop - top;
+//                draggableView.frame = UIEdgeInsetsInsetRect(draggableView.dragBeginFrame, UIEdgeInsetsMake(dy, 0, 0, 0));
+//                
+//                [self checkDraggableEventViewConflict];
+//                
+//                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
+//                    NSDate *startTime = [self _dateFromY:destTop];
+//                    [self.delegate calendarView:self didChangeEventStartTime:startTime endTime:nil];
+//                }
+//            }
         }
         onResizeBottom:^(CYFCalendarDraggableView *draggableView, UIGestureRecognizer *gesture) {
             @strongify(self)
@@ -283,9 +281,10 @@ static const int MINUTES_IN_HOUR = 60;
                 
                 [self checkDraggableEventViewConflict];
                 
-                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventStartTime:endTime:)]) {
-                    NSDate *endTime = [self _dateFromY:destBottom];
-                    [self.delegate calendarView:self didChangeEventStartTime:nil endTime:endTime];
+                if ([self.delegate respondsToSelector:@selector(calendarView:didChangeEventLength:)]) {
+                    CGFloat height = CGRectGetHeight(draggableView.frame);
+                    NSInteger minutes = [self _mimuntesFromHeight:height-draggableView.contentViewInsets.bottom];
+                    [self.delegate calendarView:self didChangeEventLength:minutes];
                 }
             }
         }];
@@ -309,6 +308,11 @@ static const int MINUTES_IN_HOUR = 60;
 - (NSDate *)_dateFromY:(CGFloat)y {
     NSInteger minutes = y / (self.timelineHeight+self.hourGapHeight) * MINUTES_IN_HOUR;
     return [self.beginOfDay dateByAddingTimeInterval:minutes*SECONDS_IN_MINUTE];
+}
+
+- (NSInteger)_mimuntesFromHeight:(CGFloat)height {
+    NSInteger minutes = height / (self.timelineHeight+self.hourGapHeight) * MINUTES_IN_HOUR;
+    return minutes;
 }
 
 - (NSDate *)_beginOfDay:(NSDate *)day {

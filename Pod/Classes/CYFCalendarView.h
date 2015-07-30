@@ -16,8 +16,8 @@
 - (UIView *)calendarView:(CYFCalendarView *)calendarView viewForEditableEvent:(id<CYFCalendarEvent>)event;
 
 @optional
-/// If startTime or endTime is nil, it's unchanged.
-- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime endTime:(NSDate *)endTime;
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventStartTime:(NSDate *)startTime;
+- (void)calendarView:(CYFCalendarView *)calendarView didChangeEventLength:(NSInteger)minutes;
 @end
 
 @interface CYFCalendarView : UIScrollView
