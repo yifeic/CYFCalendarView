@@ -302,7 +302,7 @@ static const int MINUTES_IN_HOUR = 60;
 - (CGFloat)_yFromDate:(NSDate *)date {
     NSTimeInterval interval = [date timeIntervalSinceDate:self.beginOfDay];
     NSInteger minutes = interval / SECONDS_IN_MINUTE;
-    return (float)minutes / MINUTES_IN_HOUR * (self.timelineHeight+self.hourGapHeight);
+    return roundf((float)minutes / MINUTES_IN_HOUR * (self.timelineHeight+self.hourGapHeight));
 }
 
 - (NSDate *)_dateFromY:(CGFloat)y {
